@@ -70,6 +70,7 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+#alias nano='vim'
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
@@ -80,6 +81,21 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python
+export WORKON_HOME=/home/kura/.virtualenvs
 alias workoff='deactivate'
 source /usr/local/bin/virtualenvwrapper.sh
 . /etc/bash_completion.d/django_bash_completion
+export PYTHONSTARTUP=~/.pythonrc
+export PYTHONSTARTUP=~/.pystartup
+export DJANGO_COLORS="light"
+
+# pip bash completion start
+_pip_completion()
+{
+    COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
+                   COMP_CWORD=$COMP_CWORD \
+                   PIP_AUTO_COMPLETE=1 $1 ) )
+}
+complete -o default -F _pip_completion pip
+# pip bash completion end
+
