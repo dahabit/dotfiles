@@ -37,6 +37,35 @@ function parse_git_branch {
 	git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1) /'
 }
 
+function git_uncommited_files {
+	if git rev-parse --is-inside-work-tree &> /dev/null
+	then
+		if [[ -z $(git ls-files --other --exclude-standard 2> /dev/null) ]]
+		then
+			echo ""
+		else
+			echo "∙ "
+		fi
+	fi
+}
+
+function git_staged_files {
+	if [[ "git rev-parse --is-inside-work-tree &> /dev/null)" != 'true' ]] && git rev-parse --quiet --verify HEAD &> /dev/null
+	then
+		# Default: off - these are potentially expensive on big repositories
+		git diff-index --cached --quiet --ignore-submodules HEAD 2> /dev/null
+		(( $? && $? != 128 )) && echo "∙ "
+	fi
+}
+
+function git_unstaged_files {
+        if [[ "git rev-parse --is-inside-work-tree &> /dev/null)" != 'true' ]] && git rev-parse --quiet --verify HEAD &> /dev/null
+        then
+                # Default: off - these are potentially expensive on big repositories
+                git diff --no-ext-diff --ignore-submodules --quiet --exit-code || echo "∙ "
+        fi
+}
+
 if [ `id -u` = 0 ]; then
 	COLOUR="04;01;31m"
 	PATH_COLOUR="04;01;31m"
@@ -47,7 +76,12 @@ else
 	TIME_COLOUR="0;33m"
 fi
 
-PS1='\[\033[$TIME_COLOUR\]$(date +%H:%M)\[\033[00m\] ${debian_chroot:+($debian_chroot)}\[\033[$COLOUR\]\u@\h\[\033[00m\]:\[\033[01;$PATH_COLOUR\]\w\[\033[00m\]\[\033[01;35m\] $(parse_git_branch)\[\033[00m\]\$ '
+BOLD_RED="01;31m"
+BOLD_GREEN="01;32m"
+BOLD_BLUE="01;34m"
+
+PS1='\[\033[$TIME_COLOUR\]$(date +%H:%M)\[\033[00m\] ${debian_chroot:+($debian_chroot)}\[\033[$COLOUR\]\u@\h\[\033[00m\]:\[\033[01;$PATH_COLOUR\]\w\[\033[00m\]\[\033[01;35m\] $(parse_git_branch)\[\033[00m\]\[\033[$BOLD_RED\]$(git_uncommited_files)\[\033[00m\]\[\033[$BOLD_GREEN\]$(git_staged_files)\[\033[00m\]\[\033[$BOLD_BLUE\]$(git_unstaged_files)\[\033[00m\]\n$ '
+
 unset color_prompt force_color_prompt
 
 case "$TERM" in
