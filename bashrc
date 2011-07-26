@@ -1,4 +1,3 @@
-
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -38,7 +37,7 @@ function parse_git_branch {
 	git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1) /'
 }
 
-function git_uncommited_files {
+function git_unadded_new {
 	if git rev-parse --is-inside-work-tree &> /dev/null
 	then
 		if [[ -z $(git ls-files --other --exclude-standard 2> /dev/null) ]]
@@ -50,7 +49,7 @@ function git_uncommited_files {
 	fi
 }
 
-function git_staged_files {
+function git_needs_commit {
 	if [[ "git rev-parse --is-inside-work-tree &> /dev/null)" != 'true' ]] && git rev-parse --quiet --verify HEAD &> /dev/null
 	then
 		# Default: off - these are potentially expensive on big repositories
@@ -59,7 +58,7 @@ function git_staged_files {
 	fi
 }
 
-function git_unstaged_files {
+function git_modified_files {
         if [[ "git rev-parse --is-inside-work-tree &> /dev/null)" != 'true' ]] && git rev-parse --quiet --verify HEAD &> /dev/null
         then
                 # Default: off - these are potentially expensive on big repositories
@@ -81,7 +80,7 @@ BOLD_RED="01;31m"
 BOLD_GREEN="01;32m"
 BOLD_BLUE="01;34m"
 
-PS1='\[\033[$TIME_COLOUR\]$(date +%H:%M)\[\033[00m\] ${debian_chroot:+($debian_chroot)}\[\033[$COLOUR\]\u@\h\[\033[00m\]:\[\033[01;$PATH_COLOUR\]\w\[\033[00m\]\[\033[01;35m\] $(parse_git_branch)\[\033[00m\]\[\033[$BOLD_RED\]$(git_uncommited_files)\[\033[00m\]\[\033[$BOLD_GREEN\]$(git_staged_files)\[\033[00m\]\[\033[$BOLD_BLUE\]$(git_unstaged_files)\[\033[00m\]\n$ '
+PS1='\[\033[$TIME_COLOUR\]$(date +%H:%M)\[\033[00m\] ${debian_chroot:+($debian_chroot)}\[\033[$COLOUR\]\u@\h\[\033[00m\]:\[\033[01;$PATH_COLOUR\]\w\[\033[00m\]\[\033[01;35m\] $(parse_git_branch)\[\033[00m\]\[\033[$BOLD_RED\]$(git_unadded_new)\[\033[00m\]\[\033[$BOLD_GREEN\]$(git_needs_commit)\[\033[00m\]\[\033[$BOLD_BLUE\]$(git_modified_files)\[\033[00m\]\n$ '
 
 unset color_prompt force_color_prompt
 
