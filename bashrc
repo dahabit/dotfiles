@@ -138,7 +138,11 @@ complete -o default -F _pip_completion pip
 function colourless() {
     if [ $# -ne 1 ]
     then
-        echo "Usage: colourless FILE"
+        # assume pipe
+        while IFS= read -r data
+        do
+            sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"
+        done
     else
         sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" $1
     fi
