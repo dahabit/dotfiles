@@ -139,7 +139,7 @@ function colourless() {
     if [ $# -ne 1 ]
     then
         # assume pipe
-        while IFS= read -r data
+        while read -r data
         do
             sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"
         done
