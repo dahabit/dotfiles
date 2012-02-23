@@ -107,6 +107,7 @@ alias l='ls -CF'
 alias less='less -R'
 
 alias emacs='emacs -nw'
+alias git='hub'
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
